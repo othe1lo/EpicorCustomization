@@ -1,0 +1,20 @@
+	if ((args.NotifyType == EpiTransaction.NotifyType.AddRow))
+		{
+			if ((args.Row > -1))
+			{
+				edvMscShpHd.SelectedRow["ShipViaCode"]="VCNB";
+				edvMscShpHd.SelectedRow["State"]="Nguyên Liệu";
+				string sqlx = @"EXEC E3S_PROD_MoveRequestList_AutoLoadDataForNew '"+oCon.CompanyID+"','"+oCon.UserID+"'";
+				DataTable dt = oCon.ExecuteQuery(sqlx).Tables[0];
+				if (dt.Rows.Count>0) 
+				{
+				edvMscShpHd.SelectedRow["Name"]=  dt.Rows[0][0].ToString();
+				edvMscShpHd.SelectedRow["Address1"]=  dt.Rows[0][1].ToString();
+				edvMscShpHd.SelectedRow["Address2"]=  dt.Rows[0][2].ToString();
+				edvMscShpHd.SelectedRow["Address3"]=  dt.Rows[0][3].ToString();
+				edvMscShpHd.SelectedRow["City"]=  dt.Rows[0][4].ToString();
+				edvMscShpHd.SelectedRow["TranDocTypeID"]=  dt.Rows[0][5].ToString();
+				}
+				
+			}
+		}
