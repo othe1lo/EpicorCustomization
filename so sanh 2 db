@@ -1,0 +1,2 @@
+select t1.JobNum, t1.PartNum from SKRDBPROD.Erp.JobHead t1 
+	inner join KineticUATDB.erp.JobHead t2 on t1.JobNum = t2.JobNum and t1.PartNum<> t2.PartNum
