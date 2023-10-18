@@ -1,0 +1,20 @@
+gridTheoDoiPhieuGiaoHang.DisplayLayout.ViewStyleBand = ViewStyleBand.OutlookGroupBy;
+	gridTheoDoiPhieuGiaoHang.DisplayLayout.Bands[0].SortedColumns.Add("PONum", false, true);
+	gridTheoDoiPhieuGiaoHang.Rows.ExpandAll(true);
+	gridTheoDoiPhieuGiaoHang.DisplayLayout.Override.SelectedRowAppearance.BackColor = Color.RoyalBlue;
+
+	foreach(UltraGridColumn col in  gridTheoDoiPhieuGiaoHang.DisplayLayout.Bands[0].Columns)
+	{
+		if(col.Key != "Mã kế toán" && col.Key != "Mã sản phẩm" && col.Key != "Tên sản phẩm" && col.Key != "Số lượng sản phẩm" && col.Key != "Giá bán sản phẩm"
+		   && col.Key != "Giá bán lẻ" && col.Key != "Giá giảm" && col.Key != "% Giảm giá" && col.Key != "Chênh lệch giá bán" && col.Key != "Thành tiền"
+			&& col.Key != "Tiền tệ" && col.Key != "Ghi chú" && col.Key != "Tên CTKM" && col.Key != "Mã giảm giá" && col.Key != "Giảm giá KHTT"
+			/*&& col.Key != "Phí vận chuyển"*/ && col.Key != "VAT")
+		{
+			col.MergedCellStyle = MergedCellStyle.Always;
+			col.CellAppearance.TextHAlign = HAlign.Center;
+			col.CellAppearance.TextVAlign = VAlign.Middle;
+		}
+	}
+	gridTheoDoiPhieuGiaoHang.DisplayLayout.Bands[0].Columns["OrderNum"].Header.VisiblePosition = 4;
+	
+	gridTheoDoiPhieuGiaoHang.DisplayLayout.Bands[0].Columns["% Giảm giá"].Format = "###,##0.0000";
