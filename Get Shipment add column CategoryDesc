@@ -1,0 +1,103 @@
+// **************************************************
+// Custom code for PackSlipBrowseForm
+// Created: 19/10/2023 10:03:27 AM
+// **************************************************
+//Save customization as ARInvoice Form
+extern alias Erp_Contracts_BO_ARInvoice;
+extern alias Erp_Contracts_BO_ARPromissoryNotes;
+extern alias Erp_Contracts_BO_ARInvSearch;
+extern alias Erp_Contracts_BO_ARInvcDtlSearch;
+extern alias Erp_Contracts_BO_Customer;
+extern alias Erp_Contracts_BO_Company;
+extern alias Erp_Contracts_BO_Part;
+
+extern alias E3S_Lib_Core;
+
+using System;
+using System.ComponentModel;
+using System.Data;
+using System.Diagnostics;
+using System.Windows.Forms;
+using Erp.Adapters;
+using Erp.UI;
+using Ice.Lib;
+using Ice.Adapters;
+using Ice.Lib.Customization;
+using Ice.Lib.ExtendedProps;
+using Infragistics.Win.UltraWinGrid;
+using Ice.Lib.Framework;
+using Ice.Lib.Searches;
+using Ice.UI.FormFunctions;
+using E3S.Lib.Core;
+
+public class Script
+{
+	// ** Wizard Insert Location - Do Not Remove 'Begin/End Wizard Added Module Level Variables' Comments! **
+	// Begin Wizard Added Module Level Variables **
+
+	// End Wizard Added Module Level Variables **
+	private E3SDBConnection oCon = null;
+	Ice.Lib.Framework.EpiUltraGrid gridPackNumList;
+
+	// Add Custom Module Level Variables Here **
+
+	public void InitializeCustomCode()
+	{
+		// ** Wizard Insert Location - Do not delete 'Begin/End Wizard Added Variable Initialization' lines **
+		// Begin Wizard Added Variable Initialization
+		oCon = new E3SDBConnection(oTrans);
+		oCon.GetConnectionString();
+		 gridPackNumList= (Ice.Lib.Framework.EpiUltraGrid)csm.GetNativeControlReference("e81713b1-de94-46d1-9ac2-cd03a18cea05");
+		// End Wizard Added Variable Initialization
+
+		// Begin Wizard Added Custom Method Calls
+
+		// End Wizard Added Custom Method Calls
+	}
+
+	public void DestroyCustomCode()
+	{
+		// ** Wizard Insert Location - Do not delete 'Begin/End Wizard Added Object Disposal' lines **
+		// Begin Wizard Added Object Disposal
+
+		// End Wizard Added Object Disposal
+
+		// Begin Custom Code Disposal
+
+		// End Custom Code Disposal
+	}
+	private void LayThongTinPhieuXuatKho()
+	{
+
+		PackSlipBrowseForm.WindowState =FormWindowState.Maximized;
+		gridPackNumList.DisplayLayout.Bands[0].Columns.Add("CategoryDesc","CategoryDesc");
+		gridPackNumList.DisplayLayout.Bands[0].Columns["CategoryDesc"].Header.VisiblePosition = 1; 
+	//	gridPackNumList.DisplayLayout.Bands[0].Columns.Add("CategoryDesc","CategoryDesc");
+		
+		string query = @"[E3S_ARInvoice_GetShipment_AddCategory] '" + oCon.CompanyID +"'";
+			oCon.ExecuteNonQuery(query);
+			// DataTable tbdulieu= GetDataFromStoreProc(marr_ParaLists,"E3S_ARInvoice_GetShipment_AddCategory");
+			DataTable tbdulieu = oCon.ExecuteQuery(query).Tables[0];
+		for (int i=0;i<gridPackNumList.Rows.Count;i++)
+			{
+				for (int j=0;j< tbdulieu.Rows.Count;j++ )
+				{
+				if (gridPackNumList.Rows[i].Cells["PackSlipNum"].Value.ToString()==tbdulieu.Rows[j]["PackNum"].ToString())
+						{
+							gridPackNumList.Rows[i].Cells["CategoryDesc"].Value=tbdulieu.Rows[j]["CategoryDesc"].ToString();
+						
+							
+						}
+				}
+			}
+			gridPackNumList.DisplayLayout.Bands[0].Columns["CategoryDesc"].PerformAutoResize(PerformAutoSizeType.AllRowsInBand);
+			gridPackNumList.DisplayLayout.Bands[0].Columns["CategoryDesc"].PerformAutoResize(PerformAutoSizeType.AllRowsInBand);
+			
+	}
+
+	private void PackSlipBrowseForm_Load(object sender, EventArgs args)
+	{
+		// Add Event Handler Code
+		LayThongTinPhieuXuatKho();
+	}
+}
