@@ -1,0 +1,48 @@
+
+/****** Object:  StoredProcedure [dbo].[E3S_ARInvoice_GetShipment_AddCategory]    Script Date: 4/5/2016 5:00:55 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER OFF
+GO
+/*
+[E3S_ARInvoice_GetShipment_AddCategory] 'CPKN'
+
+E3S_ARInvcEntry
+*/
+
+ALTER PROCEDURE	[E3S_ARInvoice_GetShipment_AddCategory]
+	
+@CompanyID			as varchar(50)
+
+
+WITH RECOMPILE
+AS
+BEGIN
+SET NOCOUNT ON
+SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+
+		select t1.PackNum
+		,t1.LegalNumber
+		,t1.ShipDate
+		,t2.CustID
+		,t2.Name
+		,isnull(t3.GroupCode,'') CustGroupID
+		,isnull(t3.GroupDesc,'') GroupDesc
+		,isnull(t4.SalesCatID,'') SalesCatID
+		,isnull(t4.Description,'') CategoryDesc
+		,t1.CustNum
+		,t1.ShipToCustNum
+		,t1.ShipToNum
+		,t1.BTCustNum
+		 into #tbPackList
+		from ShipHead t1 with (nolock)
+		 inner join erp.Customer t2 with (nolock) on t1.Company=t2.Company and t1.CustNum=t2.CustNum
+			left join  erp.CustGrup t3 with (nolock) on t2.Company = t3.Company and t2.GroupCode = t3.GroupCode
+				left join erp.SalesCat t4 with (nolock) on t3.Company = t4.Company and t3.SalesCatID = t4.SalesCatID
+		where t1.ReadyToInvoice=1 	and t1.Invoiced=0
+
+		
+		select * From #tbPackList
+		
+		
+END
