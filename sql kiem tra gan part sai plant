@@ -1,2 +1,5 @@
 select * from erp.PlantWhse t1 where
  not exists (Select t2.* from erp.Warehse t2 where t1.Plant = t2.Plant and t1.WarehouseCode = t2.WarehouseCode)
+
+ delete  erp.PlantWhse
+ where PartNum = 'C012-TP-000081' and Plant='MfgSys' and WarehouseCode ='NM1-SX'
