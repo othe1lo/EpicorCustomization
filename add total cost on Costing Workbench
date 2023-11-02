@@ -55,7 +55,7 @@ public class Script
 		if(ds.Tables[0].Rows.Count > 0 )
 		e.Row.Cells["JobNum"].Value = ds.Tables[0].Rows[0]["JobNum"];
 		}*/
-		e.Row.Cells["TotalCost"].Value = Convert.ToDecimal(e.Row.Cells["StdLaborCost"].Value) + Convert.ToDecimal(e.Row.Cells["StdBurdenCost"].Value) + Convert.ToDecimal(e.Row.Cells["StdMaterialCost"].Value) + Convert.ToDecimal(e.Row.Cells["StdSubContCost"].Value);
+		e.Row.Cells["TotalCost"].Value = Convert.ToDecimal(e.Row.Cells["StdLaborCost"].Value) + Convert.ToDecimal(e.Row.Cells["StdBurdenCost"].Value) + Convert.ToDecimal(e.Row.Cells["StdMaterialCost"].Value) + Convert.ToDecimal(e.Row.Cells["StdSubContCost"].Value)+ Convert.ToDecimal(e.Row.Cells["StdMtlBurCost"].Value);
 	}
 	public void DestroyCustomCode()
 	{
