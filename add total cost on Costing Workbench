@@ -1,0 +1,73 @@
+// **************************************************
+// Custom code for CostForm
+// Created: 11/1/2023 4:25:43 PM
+// **************************************************
+
+extern alias Erp_Contracts_BO_PartPlantSearch;
+extern alias Erp_Contracts_BO_Part;
+extern alias Erp_Contracts_BO_PartClass;
+extern alias Erp_Contracts_BO_ProdGrup;
+
+using System;
+using System.ComponentModel;
+using System.Data;
+using System.Diagnostics;
+using System.Windows.Forms;
+using Erp.Adapters;
+using Erp.UI;
+using Ice.Lib;
+using Ice.Adapters;
+using Ice.Lib.Customization;
+using Ice.Lib.ExtendedProps;
+using Ice.Lib.Framework;
+using Ice.Lib.Searches;
+using Ice.UI.FormFunctions;
+
+public class Script
+{
+	// ** Wizard Insert Location - Do Not Remove 'Begin/End Wizard Added Module Level Variables' Comments! **
+	// Begin Wizard Added Module Level Variables **
+
+	// End Wizard Added Module Level Variables **
+
+	// Add Custom Module Level Variables Here **
+
+	public void InitializeCustomCode()
+	{
+		// ** Wizard Insert Location - Do not delete 'Begin/End Wizard Added Variable Initialization' lines **
+		// Begin Wizard Added Variable Initialization
+
+		// End Wizard Added Variable Initialization
+
+		// Begin Wizard Added Custom Method Calls
+
+		// End Wizard Added Custom Method Calls
+		Ice.Lib.Framework.EpiUltraGrid myGrid = (Ice.Lib.Framework.EpiUltraGrid)csm.GetNativeControlReference("2588e53e-458d-4efc-96d9-e79d0cdefde2");
+		myGrid.DisplayLayout.Bands[0].Columns.Add("TotalCost", "Total Cost");
+		myGrid.InitializeRow += new Infragistics.Win.UltraWinGrid.InitializeRowEventHandler(grdList_InitializeRow);
+	}
+	private void grdList_InitializeRow(object sender, Infragistics.Win.UltraWinGrid.InitializeRowEventArgs e)
+	{
+		/*if (!String.IsNullOrEmpty(e.Row.Cells["JobNum"].Value.ToString()))
+		{
+		EpiDataView edv = oTrans.Factory("JobHead");
+		DataSet ds = _boReader.GetRows("JobHead","JobNum='" +e.Row.Cells["JobNum"].Value.ToString()+ "'","JobNum");
+		if(ds.Tables[0].Rows.Count > 0 )
+		e.Row.Cells["JobNum"].Value = ds.Tables[0].Rows[0]["JobNum"];
+		}*/
+		e.Row.Cells["TotalCost"].Value = Convert.ToDecimal(e.Row.Cells["StdLaborCost"].Value) + Convert.ToDecimal(e.Row.Cells["StdBurdenCost"].Value) + Convert.ToDecimal(e.Row.Cells["StdMaterialCost"].Value) + Convert.ToDecimal(e.Row.Cells["StdSubContCost"].Value);
+	}
+	public void DestroyCustomCode()
+	{
+		// ** Wizard Insert Location - Do not delete 'Begin/End Wizard Added Object Disposal' lines **
+		// Begin Wizard Added Object Disposal
+
+		// End Wizard Added Object Disposal
+
+		// Begin Custom Code Disposal
+
+		// End Custom Code Disposal
+		Ice.Lib.Framework.EpiUltraGrid myGrid = (Ice.Lib.Framework.EpiUltraGrid)csm.GetNativeControlReference("2588e53e-458d-4efc-96d9-e79d0cdefde2");
+		myGrid.InitializeRow -= new Infragistics.Win.UltraWinGrid.InitializeRowEventHandler(grdList_InitializeRow);
+	}
+}
