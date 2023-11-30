@@ -14,7 +14,8 @@ if (ds.OrderDtl.Count > 0)
           OrderDate = this.Db.OrderHed.First(x=> x.OrderNum == OrderNum).OrderDate;
       }
       
-      var oPriceLst = this.Db.PriceLst.FirstOrDefault(x=> x.ListedPrice_c && x.List_c == List_c && x.StartDate <= OrderDate && (!x.EndDate.HasValue || x.EndDate.Value >= OrderDate));
+      var oPriceLst = this.Db.PriceLst.Where(x=> x.ListedPrice_c && x.List_c == List_c && x.StartDate <= OrderDate && (!x.EndDate.HasValue || x.EndDate.Value >= OrderDate)).OrderByDescending(x=> x.StartDate).FirstOrDefault();
+      
       if (oPriceLst != null)
       {
         var ListCode = oPriceLst.ListCode;
