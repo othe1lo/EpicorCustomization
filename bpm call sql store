@@ -1,0 +1,35 @@
+ try
+ {
+ if (ds.OrderDtl.Count > 0)
+ {
+    Assembly System_Data_SqlClient = Assembly.Load("System.Data.SqlClient");
+
+    Type typeSqlCommand    = System_Data_SqlClient.GetType("System.Data.SqlClient.SqlCommand");
+    Type typeSqlConnection = System_Data_SqlClient.GetType("System.Data.SqlClient.SqlConnection");
+
+    var itm = ds.OrderDtl[0];
+   string query = "E3S_GetGeneralPrice '"+itm.Company+"','"+itm.OrderNum+"'";
+     var connectionString = string.Empty;
+     var svcBAQExt = Ice.Assemblies.ServiceRenderer.GetService<Ice.Contracts.BAQExtDatasourceSvcContract>(Db);
+      var datasource = svcBAQExt.GetByID("E3SCnn");
+      
+      if (datasource.BAQExtDatasource != null && datasource.BAQExtDatasource.Count > 0)
+      {
+        var connection = datasource.BAQExtDatasource.FirstOrDefault(x => x.DatasourceName == "E3SCnn");
+        if (connection != null)
+        {
+         connectionString = Ice.Lib.Bpm.Helpers.TextEncryptionHelper.Decrypt(connection.ConnectionString);
+        }
+     }
+  
+  //this.Db.ExecuteSqlCommand(query);
+     dynamic conn = Activator.CreateInstance(typeSqlConnection, connectionString);
+      conn.Open();
+      string cmdText = query; //sql commands
+      dynamic command = Activator.CreateInstance(typeSqlCommand, new object[]{ cmdText, conn });
+      //command.CommandType = System.Data.CommandType.StoredProcedure;
+      command.ExecuteNonQuery();
+      conn.Close();
+   }
+   }
+   catch{}
