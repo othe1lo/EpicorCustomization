@@ -1,0 +1,29 @@
+if (ds.OrderDtl.Count > 0)
+{
+    foreach(var itm in ds.OrderDtl.Where(x=> x.RowMod == "A" || x.RowMod == "U").ToList())
+    {
+      DateTime? OrderDate = DateTime.Now;
+      int OrderNum = ds.OrderDtl[0].OrderNum;
+      var SalesCatID = itm.SalesCatID;
+      var oSaleCat = this.Db.SalesCat.FirstOrDefault(x=> x.SalesCatID == SalesCatID);
+      string List_c = (oSaleCat != null && oSaleCat.ParentCat_c == "10")? "GT":"ALL";
+      if (ds.OrderHed.Count > 0)
+          OrderDate = ds.OrderHed[0].OrderDate;
+      else
+      {
+          OrderDate = this.Db.OrderHed.First(x=> x.OrderNum == OrderNum).OrderDate;
+      }
+      
+      var oPriceLst = this.Db.PriceLst.FirstOrDefault(x=> x.ListedPrice_c && x.List_c == List_c && x.StartDate <= OrderDate && (!x.EndDate.HasValue || x.EndDate.Value >= OrderDate));
+      if (oPriceLst != null)
+      {
+        var ListCode = oPriceLst.ListCode;
+        var PartNum = itm.PartNum;
+        var oPartPrice = this.Db.PriceLstParts.FirstOrDefault(x=> x.ListCode == ListCode && x.PartNum == PartNum);
+        if (oPartPrice != null && oPartPrice.BasePrice != Convert.ToDecimal(itm["GeneralPrice_c"]))
+        {
+            itm["GeneralPrice_c"] = oPartPrice.BasePrice;
+        }
+      }
+    }
+}
