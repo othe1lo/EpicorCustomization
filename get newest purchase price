@@ -1,0 +1,12 @@
+Select * from (
+Select C.PartNum,C.DocUnitCost,A.ApplyDate
+,ROW_NUMBER() OVER (PARTITION BY C.PartNum ORDER BY C.PartNum,A.ApplyDate desc) as RowNo
+From ERP.APInvHed A With(nolock)
+	  inner join ERP.APInvDtl C With(nolock)
+	  On A.Company = C.Company 
+	    And A.VendorNum = C.VendorNum
+		And A.InvoiceNum = C.InvoiceNum
+		AND C.LineType in ('R','U')
+	where A.Posted =1
+	) A
+where RowNo =1
