@@ -1,0 +1,80 @@
+private void btnIssue_Click(object sender, System.EventArgs args)
+	{
+		// ** Place Event Handling Code Here **
+		//var edvMscShpHd = ((EpiDataView)(this.oTrans.EpiDataViews["UD102"]));
+		//Lay du lieu
+		oTrans.Update();
+		oTrans.Refresh();
+		string sql = @"EXEC E3S_PROD_MscShp_ReturnSupplier '"+oCon.CompanyID+"','"+edvMscShpHd.CurrentDataRow["PackNum"].ToString()+"'";
+		DataSet ds = oCon.ExecuteQuery(sql);
+		
+		
+
+		DataTable dt = ds.Tables[0];
+		DataTable dt1 = ds.Tables[1];
+		if( 0 == dt1.Rows.Count )
+		{
+		//DataTable dt = oCon.ExecuteQuery(sql).Tables[0];
+		//DataTable dt1 = oCon.ExecuteQuery(sql).Tables[1];
+		//End
+		foreach(DataRow dRow in dt.Rows)
+		{
+			Erp.Adapters.IssueReturnAdapter ia = new Erp.Adapters.IssueReturnAdapter(oTrans);
+            ia.BOConnect();
+
+            string msg;
+            bool reqInput;
+            string lgl;
+            string partTran;
+
+	
+            ia.GetNewIssueReturn("STK-UKN", Guid.Empty, "");
+            //ia.get''
+			
+            Erp.BO.IssueReturnDataSet.IssueReturnRow row = ia.IssueReturnData.IssueReturn[0];
+           //row.TranQty = Convert.ToDecimal(dRow["AllocateQty"]);
+			row.PartNum= dRow["PartNum"].ToString();
+			row.LotNum= (string)dRow["LotNum"];
+			row.OrderNum = 0;
+			row.TranDate = Convert.ToDateTime(dRow["ShipDate"]);
+			row.FromWarehouseCode = dRow["WarehouseCode"].ToString();
+			row.FromBinNum = dRow["BinNum"].ToString();
+			//row.ToWarehouseCode = (string)dRow["Shortchar05"].ToString();
+			//row.ToBinNum = (string)dRow["Shortchar06"].ToString();
+			row.UM = dRow["IUM"].ToString();
+			row.Plant = dRow["Plant"].ToString();
+			row.ReasonCode = dRow["ReasonCode"].ToString();
+			row.TranReference = dRow["LegalNumber"].ToString();
+		    row.TranDocTypeID = "DOC52"; 	
+	        row.TranQty = Convert.ToDecimal(dRow["Quantity"]);
+	        row.RowMod = "A";
+              ia.PrePerformMaterialMovement(out reqInput);
+              ia.PerformMaterialMovement(true, out lgl, out partTran);
+				ia.Dispose();
+				
+		}
+		//CheckUD102(edvUD102.CurrentDataRow["Key1"].ToString(),edvUD102.CurrentDataRow["Key3"].ToString());
+		UpdateShipStatus(edvMscShpHd.CurrentDataRow["PackNum"].ToString());
+		MessageBox.Show("Tranfer!");
+		}
+		else 
+		{			string message = string.Empty;
+					message +="CAN NOT transfer this Pack. Pleae check the list: \n\n";
+					foreach (DataRow row in dt1.Rows)
+					{
+					     
+					          message += "PartNum " + row["PartNum"] + ": Total Qty "+ row["Quantity"]+ " < On Hand"+ "\n";
+					     
+					}
+				
+					 MessageBox.Show(message);
+					
+		}
+		try
+		{
+		oTrans.Refresh();
+		
+		}
+	catch{}
+		
+	}
