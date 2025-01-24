@@ -1,0 +1,98 @@
+private void CallPartAdapterGetNewPartWhseMethod(string PartNum,string plant, string WhsCode)
+	{
+		try
+		{
+			// Declare and Initialize EpiDataView Variables
+			// Declare and create an instance of the Adapter.
+			PartAdapter adapterPart = new PartAdapter(this.oTrans);
+			adapterPart.BOConnect();
+
+			// Declare and Initialize Variables
+			// TODO: You may need to replace the default initialization with valid values as required for the BL method call.
+
+			// Call Adapter method
+			adapterPart.GetByID(PartNum);
+			bool result = adapterPart.GetNewPartWhse(PartNum, plant);
+			
+			//adapterPart.GetNewPartWhse(PartNum,itemPlant.Substring(itemPlant.IndexOf("~")+1).Substring(0,(itemPlant.Substring(itemPlant.IndexOf("~")+1)).IndexOf("~")));
+			DataTable dtPartware=adapterPart.PartData.PartWhse;
+			dtPartware.Rows[dtPartware.Rows.Count -1]["PartNum"]=PartNum;
+			dtPartware.Rows[dtPartware.Rows.Count -1]["WarehouseCode"]=WhsCode;
+			dtPartware.Rows[dtPartware.Rows.Count -1]["PlantOwner"]=plant;		
+			adapterPart.Update();
+			// Cleanup Adapter Reference
+			adapterPart.Dispose();
+
+		} catch (System.Exception ex)
+		{
+			ExceptionBox.Show(ex);
+		}
+	}
+
+
+-----------------------
+	foreach(DataRow dRow in dt.Rows)
+			{
+				CallPartAdapterGetNewPartWhseMethod( dRow["PartNum"].ToString(), dRow["Plant"].ToString(), dRow["WarehouseCode"].ToString());
+			}
+
+
+private void btnGetData_Click(object sender, System.EventArgs args)
+	{
+		try 
+		{	
+			EpiDataView edvClient = (EpiDataView)(oTrans.EpiDataViews["CallContextClientData"]);
+  			string CurrentSite = edvClient.dataView[edvClient.Row]["CurrentPlant"].ToString(); 
+			string Dept = cbDept.Text;  
+			string LegalNumber =  txtLegalNumber.Text;   
+			string Status =  cbStatus.Text;     
+			dsSummary = oCon.ExecuteStoredProc("E3S_PROD_MoveRequestList",oCon.CompanyID,LegalNumber,dtFrom.DateTime,dtTo.DateTime,Dept,Status,oCon.PlantID);
+			grdHeader.DataSource = dsSummary.Tables[0].DefaultView;
+			grdHeader.ExFormatGrid(false, false, true, true, false, true, false, false, false, false);
+			//grdHeader.DisplayLayout.Bands[0].Columns["OpenLine"].Header.CheckBoxVisibility = HeaderCheckBoxVisibility.Never;
+			//grdHeader.DisplayLayout.Bands[0].Columns["PackNum"].Format = "0";
+			grdHeader.DisplayLayout.Bands[0].Columns["LegalNumber"].Width  = 120;
+			foreach (UltraGridColumn col in grdHeader.DisplayLayout.Bands[0].Columns)
+            {
+				if(col.Key == "Selected")
+				{
+					col.CellAppearance.BackColor = Color.White;
+					col.CellActivation = Activation.AllowEdit;
+				}
+				else
+				{
+					col.Header.CheckBoxVisibility = HeaderCheckBoxVisibility.Never;
+					col.CellAppearance.BackColor = Color.LightGray;	
+					col.CellActivation = Activation.ActivateOnly;
+				}
+			}
+			
+			if(grdHeader.Rows.Count > 0)
+			{
+				dsDetail = oCon.ExecuteStoredProc("E3S_PROD_MoveRequestList_Dtl",oCon.CompanyID,LegalNumber,dtFrom.DateTime,dtTo.DateTime,Dept,Status,CurrentSite);
+				grdRequestDtl.DataSource = dsDetail.Tables[0].DefaultView;
+				grdRequestDtl.ExFormatGrid(false, false, true, true, false, true, false, false, false, false);
+				grdHeader.Rows[0].Activate();	
+				foreach (UltraGridColumn col in grdRequestDtl.DisplayLayout.Bands[0].Columns)
+            	{
+					if(col.Key == "TransferQty")
+					{
+						col.CellAppearance.BackColor = Color.White;
+						col.CellActivation = Activation.AllowEdit;
+					}
+					else
+					{
+						col.Header.CheckBoxVisibility = HeaderCheckBoxVisibility.Never;
+						col.CellAppearance.BackColor = Color.LightGray;	
+						col.CellActivation = Activation.ActivateOnly;
+					}
+				
+				}
+				
+			}
+		}
+		catch (Exception ex)
+        {
+            MessageBox.Show("btnGetData_Click: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+	}
